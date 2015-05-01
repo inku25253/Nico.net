@@ -466,6 +466,18 @@ namespace Nico.net
 	[XmlRoot("thread")]
 	public class NicoThread
 	{
+
+		public NicoThread()
+		{
+			Version = 20061206;
+		}
+
+		public NicoThread(NicoServerInfo info)
+			: this()
+		{
+			this.Thread = info.ThreadId;
+		}
+
 		[XmlAttribute("version")]
 		public long Version { get; set; }
 		[XmlAttribute("thread")]

@@ -25,7 +25,7 @@ namespace Nico.net
 			request.AddHeader("Accept", "text/html */*");
 			var response =  client.ExecuteAsGet<NicoAlertInfo>(request, "GET");
 			var info = response.Data;
-			return Connect(info.ServerInfo, new NicoThread() { Thread = info.ServerInfo.ThreadId, Version = 20061206 });
+			return Connect(info.ServerInfo, new NicoThread(info.ServerInfo));
 		}
 
 		/// <summary>
@@ -34,7 +34,7 @@ namespace Nico.net
 		/// <param name="liveId"></param>
 		/// <param name="container"></param>
 		/// <returns></returns>
-		public static NicoClient ConnectLiveCommentServer(string liveId, CookieContainer container)
+		public static NicoClient ConnectLiveCommentServer(string liveId, CookieContainer container, out NicoPlayerStatus livestatus)
 		{
 			var match = liveIdRegex.Match(liveId);
 			if(match.Success)
@@ -55,10 +55,10 @@ namespace Nico.net
 
 
 			XmlSerializer serializer = new XmlSerializer(typeof(NicoPlayerStatus));
-			var playerstatus = (NicoPlayerStatus)serializer.Deserialize(new StringReader(result.Content));
+			livestatus = (NicoPlayerStatus)serializer.Deserialize(new StringReader(result.Content));
 
 
-			return Connect(playerstatus.CommentServer, new NicoThread() { Thread = playerstatus.CommentServer.ThreadId, Version = 20061206, ResFrom = -playerstatus.Stream.CommentCount });
+			return Connect(livestatus.CommentServer, new NicoThread(livestatus.CommentServer) { ResFrom = -livestatus.Stream.CommentCount });
 
 		}
 		public static NicoClient Connect(NicoServerInfo info, NicoThread thread)
@@ -95,18 +95,19 @@ namespace Nico.net
 			client.Close();
 		}
 
-		private StreamWriter fs = File.CreateText("log");
 		void client_OnDataReceived(object sender, SocketReceiveEventArgs<object, object, object> args)
 		{
 			if(args.Packet is NicoResponse)
 			{
-				NicoAlertResponse response =(NicoResponse)args.Packet;
-				Console.WriteLine("==================================");
-				Console.WriteLine("  Live\t\t" + response.LiveId);
-				Console.WriteLine("  User\t\t" + response.LiveOwnerUserId);
-				Console.WriteLine("  Comunity\t" + response.ComunityId);
-				Console.WriteLine("==================================");
-				Console.WriteLine();
+				Console.WriteLine(((NicoResponse)args.Packet).Content);
+				/*
+					NicoAlertResponse response =(NicoResponse)args.Packet;
+					Console.WriteLine("==================================");
+					Console.WriteLine("  Live\t\t" + response.LiveId);
+					Console.WriteLine("  User\t\t" + response.LiveOwnerUserId);
+					Console.WriteLine("  Comunity\t" + response.ComunityId);
+					Console.WriteLine("==================================");
+					Console.WriteLine();*/
 			}
 		}
 	}

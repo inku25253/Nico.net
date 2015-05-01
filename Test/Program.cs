@@ -26,12 +26,11 @@ namespace Test
 
 			}*/
 
-
 			//NicoClient alertClient = NicoClient.ConnectAlertServer();
 			//string live = Console.ReadLine();
 			//alertClient.Close();
-
-			NicoClient.ConnectLiveCommentServer("", container);
+			NicoPlayerStatus livestatus;
+			NicoClient.ConnectLiveCommentServer("", container, out livestatus);
 			Console.ReadLine();
 		}
 	}
