@@ -1,0 +1,1 @@
+﻿RestSharp - Apache License Version 2.0 https://github.com/restsharp/RestSharp/blob/master/LICENSE.txt

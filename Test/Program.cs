@@ -27,9 +27,11 @@ namespace Test
 			}*/
 
 
-			NicoClient.ConnectAlertServer();
-			//NicoClient.Connect(new NicoServerInfo() { Address = "hiroba.nicovideo.jp", Port = 2525, ThreadId = 1322481864 },
-			//new NicoThread() { ResFrom = -1000, Version = 20061206, NicoruScore = 1, Thread = 1322481864 });
+			//NicoClient alertClient = NicoClient.ConnectAlertServer();
+			//string live = Console.ReadLine();
+			//alertClient.Close();
+
+			NicoClient.ConnectLiveCommentServer("", container);
 			Console.ReadLine();
 		}
 	}

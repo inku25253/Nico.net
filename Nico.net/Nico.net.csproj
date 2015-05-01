@@ -30,6 +30,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="RestSharp">
+      <HintPath>..\packages\RestSharp.105.1.0\lib\net45\RestSharp.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Net.Http" />
@@ -45,7 +48,6 @@
   <ItemGroup>
     <Compile Include="NicoInfo.cs" />
     <Compile Include="NicoClient.cs" />
-    <Compile Include="NicoPacket.cs" />
     <Compile Include="NicoPacketEnDecoder.cs" />
     <Compile Include="NicoXmlRegistry.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -55,6 +57,14 @@
       <Project>{5a5ed60a-648c-450b-ad20-06b0d915ef61}</Project>
       <Name>System.Net.Sockets.Plus</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Licenses.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
