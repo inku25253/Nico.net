@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -80,5 +81,41 @@ namespace Nico.net
 		{
 			return new NicoAlertResponse(x);
 		}
+	}
+
+
+
+
+
+	[XmlRoot("thread")]
+	public class NicoThread
+	{
+		[XmlAttribute("version")]
+		public long Version { get; set; }
+		[XmlAttribute("thread")]
+		public long Thread { get; set; }
+		[XmlAttribute("res_from"), DefaultValue(0)]
+		public long ResFrom { get; set; }
+		[XmlAttribute("fork"), DefaultValue(false)]
+		public bool Fork { get; set; }
+		[XmlAttribute("scores"), DefaultValue(false)]
+		public bool ScoreRequest { get; set; }
+		[XmlAttribute("click_revision"), DefaultValue(0)]
+		public int AtButtonClickCount { get; set; }
+		[XmlAttribute("user_id"), DefaultValue("")]
+		public string UserId { get; set; }
+
+		[XmlAttribute("nicoru"), DefaultValue(0)]
+		public int NicoruScore { get; set; }
+		[XmlAttribute("when"), DefaultValue(0)]
+		public long When { get; set; }
+		[XmlAttribute("waybackkey"), DefaultValue("")]
+		public string WayBackKey { get; set; }
+		[XmlAttribute("threadkey"), DefaultValue("")]
+		public string ThreadKey { get; set; }
+		[XmlAttribute("with_global"), DefaultValue(0)]
+		public int WithGlobal { get; set; }
+		[XmlAttribute("language"), DefaultValue(0)]
+		public int Language { get; set; }
 	}
 }

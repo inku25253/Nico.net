@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Net.Sockets.Plus;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
 
@@ -15,43 +12,58 @@ namespace Nico.net
 	{
 		public const string AlertApiUrl = "http://live.nicovideo.jp/api/getalertinfo";
 
+		private static readonly Uri NiconicoUri = new Uri("http://nicovideo.jp/");
+
 		public static NicoClient ConnectAlertServer()
 		{
 			WebClient client = new WebClient();
-
 			XmlSerializer serializer = new XmlSerializer(typeof(NicoAlertInfo));
-			NicoAlertInfo info = (NicoAlertInfo)serializer.Deserialize(client.OpenRead(AlertApiUrl));
+			string xml = client.DownloadString(AlertApiUrl);
+			Console.WriteLine(xml);
+			StringReader sr = new StringReader(xml);
+			NicoAlertInfo info = (NicoAlertInfo)serializer.Deserialize(sr);
 
-			return new NicoClient(info.ServerInfo);
+			return new NicoClient(info.ServerInfo, new NicoThread() { Thread = info.ServerInfo.ThreadId, Version = 20061206 });
+		}
+		public static NicoClient Connect(NicoServerInfo info, NicoThread thread)
+		{
+			return new NicoClient(info, thread);
 		}
 
 
 
-		private SocketClient<object,NicoPacket,NicoPacket> client = new SocketClient<object, NicoPacket, NicoPacket>();
+		private SocketClient<object,object,object> client = new SocketClient<object, object, object>();
 
-		private NicoClient(NicoServerInfo serverInfo)
+		private NicoClient(NicoServerInfo serverInfo, NicoThread threadData)
 		{
 			var packetEnDecoder = new NicoPacketEnDecoder();
 			client.Encoder = packetEnDecoder;
 			client.Decoder = packetEnDecoder;
 
+			client.OnSocketException += (s, e) => Console.WriteLine(e.Exception.Message);
+			client.OnDisconnect += (s, e) => Console.WriteLine("Disconnected.");
 
 			client.OnConnected += (s, e) =>
 			{
-				e.Send(new NicoPacket() { xmlData = "<thread thread=\"" + serverInfo.ThreadId + "\" version=\"20061206\" res_from=\"0\" scores=\"1\"/>" });
+				Console.WriteLine("Connected");
+				e.Send(threadData);
 			};
 
 			client.OnDataReceived += client_OnDataReceived;
 			client.Connect(new DnsEndPoint(serverInfo.Address, serverInfo.Port));
 		}
 		private StreamWriter fs = File.CreateText("log");
-		XmlSerializer serializer = new XmlSerializer(typeof(NicoResponse));
-		void client_OnDataReceived(object sender, SocketReceiveEventArgs<object, NicoPacket, NicoPacket> args)
+		void client_OnDataReceived(object sender, SocketReceiveEventArgs<object, object, object> args)
 		{
-			if(args.Packet.xmlData.StartsWith("<chat"))
+			if(args.Packet is NicoResponse)
 			{
-				NicoAlertResponse response = (NicoResponse)serializer.Deserialize(XmlReader.Create(new StringReader(args.Packet.xmlData)));
-				Console.WriteLine(response.LiveId + "\n\t" + response.LiveOwnerUserId + "\n\t" + response.ComunityId);
+				NicoAlertResponse response =(NicoResponse)args.Packet;
+				Console.WriteLine("==================================");
+				Console.WriteLine("  Live\t\t" + response.LiveId);
+				Console.WriteLine("  User\t\t" + response.LiveOwnerUserId);
+				Console.WriteLine("  Comunity\t" + response.ComunityId);
+				Console.WriteLine("==================================");
+				Console.WriteLine();
 			}
 		}
 	}

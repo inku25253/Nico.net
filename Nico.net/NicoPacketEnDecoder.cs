@@ -5,25 +5,34 @@ using System.Linq;
 using System.Net.Sockets.Plus;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
+using System.Xml.Serialization;
 
 namespace Nico.net
 {
-	class NicoPacketEnDecoder :IPacketDecoder<object, NicoPacket, NicoPacket>, IPacketEncoder<object, NicoPacket, NicoPacket>
+	class NicoPacketEnDecoder :IPacketDecoder<object, object, object>, IPacketEncoder<object, object, object>
 	{
 		private static readonly UTF8Encoding encoding = new UTF8Encoding();
+		private static readonly XmlSerializerNamespaces EmptyNamespace = new XmlSerializerNamespaces(new[] { XmlQualifiedName.Empty });
+		private static readonly XmlWriterSettings EmptySettings = new XmlWriterSettings() { Indent = false, OmitXmlDeclaration = true };
+		#region IPacketEncoder<object,object,object> メンバー
 
-		#region IPacketEncoder<object,NicoPacket,NicoPacket> メンバー
-
-		public byte[] Encode(NicoPacket packet, SocketClient<object, NicoPacket, NicoPacket> client)
+		public byte[] Encode(object packet, SocketClient<object, object, object> client)
 		{
-			return encoding.GetBytes(packet.xmlData + "\0");
+
+			XmlSerializer serializer = new XmlSerializer(packet.GetType());
+			TextWriter writer = new StringWriter();
+			var xml_writer = XmlWriter.Create(writer, EmptySettings);
+			serializer.Serialize(xml_writer, packet, EmptyNamespace);
+			string xml = writer.ToString();
+			return encoding.GetBytes(xml + "\0");
 		}
 
 		#endregion
 
-		#region IPacketDecoder<object,NicoPacket,NicoPacket> メンバー
+		#region IPacketDecoder<object,object,object> メンバー
 
-		public NicoPacket Decode(object sender, SocketClient<object, NicoPacket, NicoPacket> client, SocketStream<object, NicoPacket, NicoPacket> stream)
+		public object Decode(object sender, SocketClient<object, object, object> client, SocketStream<object, object, object> stream)
 		{
 			MemoryStream ms = new MemoryStream();
 			byte data;
@@ -32,9 +41,8 @@ namespace Nico.net
 				ms.WriteByte(data);
 			}
 
-			NicoPacket packet = new NicoPacket();
-			packet.xmlData = encoding.GetString(ms.ToArray());
-			return packet;
+			string xml =  encoding.GetString(ms.ToArray());
+			return NicoXmlRegistry.Deserialize(xml);
 		}
 
 		#endregion

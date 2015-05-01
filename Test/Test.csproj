@@ -49,6 +49,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CookedCookie\CookedCookie.csproj">
+      <Project>{2ab3da54-bef2-4851-b89f-5c1f2f11517c}</Project>
+      <Name>CookedCookie</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Nico.net\Nico.net.csproj">
       <Project>{e50545b7-b9a6-44b9-babc-3fa621752ce9}</Project>
       <Name>Nico.net</Name>

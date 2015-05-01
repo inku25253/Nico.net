@@ -8,6 +8,6 @@ namespace Nico.net
 {
 	public struct NicoPacket
 	{
-		public string xmlData { get; set; }
+		public object Data { get; set; }
 	}
 }
