@@ -9,6 +9,7 @@ namespace CookedCookie
 	public class BrowserType
 	{
 		public static readonly BrowserType Other = new BrowserType(null);
+		[Obsolete("IEは未対応！", true)]
 		public static readonly BrowserType IE = new BrowserType(null);
 		public static readonly BrowserType Chrome = new BrowserType(new BrowserChrome());
 
